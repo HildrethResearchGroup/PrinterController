@@ -1,6 +1,10 @@
-public struct PrinterController {
-    public private(set) var text = "Hello, World!"
+//
+//  PrinterController.swift
+//  
+//
+//  Created by Connor Barnes on 7/13/21.
+//
 
-    public init() {
-    }
+public actor PrinterController {
+  
 }

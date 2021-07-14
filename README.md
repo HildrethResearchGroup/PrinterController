@@ -1,3 +1,3 @@
 # PrinterController
 
-A description of this package.
+A package for controlling a nano-inkjet printer.
