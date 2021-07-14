@@ -30,3 +30,4 @@ public extension PrinterController {
     xpsq8Controller = nil
   }
 }
+
