@@ -7,6 +7,7 @@
 
 public enum InstrumentState {
   case notConnected
+  case notInitialized
   case connecting
   case busy
   case blocked

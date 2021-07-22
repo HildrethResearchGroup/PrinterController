@@ -9,27 +9,33 @@ import XPSQ8Kit
 
 public extension PrinterController {
   func searchForHome() async throws {
-    await with(.xpsq8) {
-      try await stageGroup?.searchForHome()
+    try await with(.xpsq8) {
+      try await stageGroup.searchForHome()
     }
   }
   
   func moveAbsolute(in dimension: Dimension, to location: Double) async throws {
-    await with(.xpsq8) {
-      try await stage(for: dimension)?.moveAbsolute(to: location)
+    try await with(.xpsq8) {
+      try await stage(for: dimension).moveAbsolute(to: location)
     }
   }
   
   func moveRelative(in dimension: Dimension, by displacement: Double) async throws {
-    await with(.xpsq8) {
-      try await stage(for: dimension)?.moveRelative(by: displacement)
+    try await with(.xpsq8) {
+      try await stage(for: dimension).moveRelative(by: displacement)
+    }
+  }
+  
+  func position(in dimension: Dimension) async throws -> Double {
+    try await with(.xpsq8) {
+      try await stage(for: dimension).currentPosition
     }
   }
 }
 
 // MARK: - Dimension
 public extension PrinterController {
-  enum Dimension: String {
+  enum Dimension: String, CaseIterable {
     case x = "X"
     case y = "Y"
     case z = "Z"
@@ -38,11 +44,17 @@ public extension PrinterController {
 
 // MARK: Stage Groups
 extension PrinterController {
-  var stageGroup: StageGroup? {
-    try? xpsq8Controller?.makeStageGroup(named: "M")
+  var stageGroup: StageGroup {
+    get throws {
+      guard let controller = xpsq8Controller else {
+        throw Error.instrumentNotConnected
+      }
+      
+      return try controller.makeStageGroup(named: "M")
+    }
   }
   
-  func stage(for dimension: Dimension) -> Stage? {
-    try? stageGroup?.makeStage(named: dimension.rawValue)
+  func stage(for dimension: Dimension) throws -> Stage {
+    try stageGroup.makeStage(named: dimension.rawValue)
   }
 }

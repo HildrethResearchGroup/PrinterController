@@ -38,6 +38,16 @@ extension PrinterController {
       waveformState = state
     }
   }
+  
+  @MainActor
+  fileprivate func state(for instrument: Instrument) -> InstrumentState {
+    switch instrument {
+    case .xpsq8:
+      return xpsq8State
+    case .waveform:
+      return waveformState
+    }
+  }
 }
 
 // MARK: - Connecting to Instruments
@@ -47,7 +57,7 @@ public extension PrinterController {
       await setState(instrument: .waveform, state: .connecting)
       sleep(1)
       waveformController = try await configuration.makeInstrument()
-      await setState(instrument: .waveform, state: .ready)
+      await setState(instrument: .waveform, state: .notInitialized)
     } catch {
       await setState(instrument: .waveform, state: .notConnected)
       throw error
@@ -58,7 +68,7 @@ public extension PrinterController {
     do {
       await setState(instrument: .xpsq8, state: .connecting)
       xpsq8Controller = try await configuration.makeInstrument()
-      await setState(instrument: .xpsq8, state: .ready)
+      await setState(instrument: .xpsq8, state: .notInitialized)
     } catch {
       await setState(instrument: .xpsq8, state: .notConnected)
       throw error
@@ -76,13 +86,41 @@ public extension PrinterController {
   }
 }
 
+// MARK: - Initializing Instruments
+public extension PrinterController {
+  func initializeWaveform() async throws {
+    // TODO: Implement
+    await setState(instrument: .waveform, state: .ready)
+  }
+  
+  func initializeXPSQ8() async throws {
+    try await searchForHome()
+    await setState(instrument: .xpsq8, state: .ready)
+  }
+}
+
 // MARK: - Instrument State
 extension PrinterController {
-  func with(
+  func with<T>(
     _ instruments: Set<Instrument>,
     blocking blocked: Set<Instrument> = [],
-    perform action: () async throws -> ()
-  ) async {
+    perform action: () async throws -> T
+  ) async throws -> T {
+    for instrument in instruments {
+      switch await state(for: instrument) {
+      case .notConnected, .connecting:
+        throw Error.instrumentNotConnected
+      case .notInitialized:
+        throw Error.instrumentNotInitialized
+      case .busy:
+        throw Error.instrumentBusy
+      case .blocked:
+        throw Error.instrumentBlocked
+      default:
+        break
+      }
+    }
+    
     for instrument in instruments {
       await setState(instrument: instrument, state: .busy)
     }
@@ -91,7 +129,7 @@ extension PrinterController {
       await setState(instrument: instrument, state: .blocked)
     }
     
-    try? await action()
+    let result = try await action()
     
     for instrument in instruments {
       await setState(instrument: instrument, state: .ready)
@@ -100,29 +138,31 @@ extension PrinterController {
     for instrument in blocked {
       await setState(instrument: instrument, state: .ready)
     }
+    
+    return result
   }
   
-  func with(
+  func with<T>(
     _ instrument: Instrument,
     blocking blocked: Set<Instrument> = [],
-    perform action: () async throws -> ()
-  ) async {
-    await with([instrument], blocking: blocked, perform: action)
+    perform action: () async throws -> T
+  ) async throws -> T {
+    return try await with([instrument], blocking: blocked, perform: action)
   }
   
-  func with(
+  func with<T>(
     _ instrument: Instrument,
     blocking blocked: Instrument,
-    perform action: () async throws -> ()
-  ) async {
-    await with([instrument], blocking: [blocked], perform: action)
+    perform action: () async throws -> T
+  ) async throws -> T {
+    return try await with([instrument], blocking: [blocked], perform: action)
   }
   
-  func with(
+  func with<T>(
     _ instruments: Set<Instrument>,
     blocking blocked: Instrument,
-    perform action: () async throws -> ()
-  ) async {
-    await with(instruments, blocking: [blocked], perform: action)
+    perform action: () async throws -> T
+  ) async throws -> T {
+    return try await with(instruments, blocking: [blocked], perform: action)
   }
 }
