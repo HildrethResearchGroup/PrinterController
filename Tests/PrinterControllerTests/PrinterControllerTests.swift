@@ -6,7 +6,7 @@ final class PrinterControllerTests: XCTestCase {
   let xpsq8Configuration = XPSQ8Configuration(address: "192.168.1.4", port: 5001)
   
   func testWaveformConnection() async {
-    let controller = PrinterController()
+    let controller = await PrinterController()
     
     do {
       try await controller.connectToWaveform(configuration: waveformConfiguration)
@@ -24,12 +24,12 @@ final class PrinterControllerTests: XCTestCase {
   }
   
   func testXPSQ8Connection() async {
-    let controller = PrinterController()
+    let controller = await PrinterController()
     
     do {
       try await controller.connectToXPSQ8(configuration: xpsq8Configuration)
     } catch {
-      XCTFail("Could not connect to waveform generator.")
+      XCTFail("Could not connect to XPS-Q8.")
     }
     
     await controller.disconnectFromXPSQ8()
@@ -37,7 +37,7 @@ final class PrinterControllerTests: XCTestCase {
     do {
       try await controller.connectToXPSQ8(configuration: xpsq8Configuration)
     } catch {
-      XCTFail("Could not reconnect to waveform generator.")
+      XCTFail("Could not reconnect to XPS-Q8.")
     }
   }
 }

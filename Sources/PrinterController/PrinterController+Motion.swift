@@ -9,15 +9,21 @@ import XPSQ8Kit
 
 public extension PrinterController {
   func searchForHome() async throws {
-    try await stageGroup?.searchForHome()
+    await with(.xpsq8) {
+      try await stageGroup?.searchForHome()
+    }
   }
   
   func moveAbsolute(in dimension: Dimension, to location: Double) async throws {
-    try await stage(for: dimension)?.moveAbsolute(to: location)
+    await with(.xpsq8) {
+      try await stage(for: dimension)?.moveAbsolute(to: location)
+    }
   }
   
   func moveRelative(in dimension: Dimension, by displacement: Double) async throws {
-    try await stage(for: dimension)?.moveRelative(by: displacement)
+    await with(.xpsq8) {
+      try await stage(for: dimension)?.moveRelative(by: displacement)
+    }
   }
 }
 

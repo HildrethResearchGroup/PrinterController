@@ -16,6 +16,18 @@ public struct WaveformConfiguration {
   public var timeout: TimeInterval = 5.0
   public var attributes = MessageBasedInstrumentAttributes()
   
+  public init(
+    address: String,
+    port: Int,
+    timeout: TimeInterval = 5.0,
+    attributes: MessageBasedInstrumentAttributes = .init()
+  ) {
+    self.address = address
+    self.port = port
+    self.timeout = timeout
+    self.attributes = attributes
+  }
+  
   public static var empty: WaveformConfiguration {
     return .init(address: "0.0.0.0", port: 5025)
   }
@@ -36,6 +48,16 @@ public struct XPSQ8Configuration: Sendable {
   public var address: String
   public var port: Int
   public var timeout: TimeInterval = 5.0
+  
+  public init(
+    address: String,
+    port: Int,
+    timeout: TimeInterval = 5.0
+  ) {
+    self.address = address
+    self.port = port
+    self.timeout = timeout
+  }
   
   public static var empty: XPSQ8Configuration {
     return .init(address: "0.0.0.0", port: 5001)
