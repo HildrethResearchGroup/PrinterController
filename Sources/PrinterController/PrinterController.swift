@@ -94,6 +94,8 @@ public extension PrinterController {
   }
   
   func initializeXPSQ8() async throws {
+		try await xpsq8Controller?.restart()
+		try await stageGroup.initialize()
     try await searchForHome()
     await setState(instrument: .xpsq8, state: .ready)
   }

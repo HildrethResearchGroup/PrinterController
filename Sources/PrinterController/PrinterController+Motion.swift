@@ -9,6 +9,17 @@ import XPSQ8Kit
 
 public extension PrinterController {
   func searchForHome() async throws {
+		switch await xpsq8State {
+		case .notConnected, .connecting:
+			throw Error.instrumentNotConnected
+		case .busy:
+			throw Error.instrumentBusy
+		case .blocked:
+			throw Error.instrumentBlocked
+		case .ready, .notInitialized:
+			try await stageGroup.searchForHome()
+		}
+		
     try await with(.xpsq8) {
       try await stageGroup.searchForHome()
     }
