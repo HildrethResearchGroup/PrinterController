@@ -94,9 +94,16 @@ public extension PrinterController {
   }
   
   func initializeXPSQ8() async throws {
-		try await xpsq8Controller?.restart()
+    guard let xpsq8Controller = xpsq8Controller else { throw Error.instrumentNotConnected }
+		try await xpsq8Controller.restart()
+    try await stageGroup.waitForStatus(withCodes: [0], interval: 1.0)
+    try await print("Restarted: ", stageGroup.statusCode)
 		try await stageGroup.initialize()
+    try await stageGroup.waitForStatus(withCodes: [42])
+    try await print("Initialized: ", stageGroup.statusCode)
     try await searchForHome()
+    try await stageGroup.waitForStatus(withCode: 11)
+    try await print("Homed: ", stageGroup.statusCode)
     await setState(instrument: .xpsq8, state: .ready)
   }
 }
