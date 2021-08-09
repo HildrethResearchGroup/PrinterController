@@ -50,6 +50,18 @@ extension PrinterController {
   }
   
   @MainActor
+  func setXPSQ8LastSetDisplacementMode(in dimension: Dimension, to displacementMode: DisplacementMode) {
+    switch dimension {
+    case .x:
+      xpsq8State.xLastSetDisplacementMode = displacementMode
+    case .y:
+      xpsq8State.yLastSetDisplacementMode = displacementMode
+    case .z:
+      xpsq8State.zLastSetDisplacementMode = displacementMode
+    }
+  }
+  
+  @MainActor
   func setXPSQ8Status(_ status: StageGroup.Status?) {
     xpsq8State.groupStatus = status
   }

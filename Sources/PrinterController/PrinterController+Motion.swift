@@ -27,6 +27,26 @@ public extension PrinterController {
   
   func moveAbsolute(in dimension: Dimension, to location: Double) async throws {
     try await with(.xpsq8) {
+      // Make sure SGammaParameters are set
+      if let mode = await xpsq8State.displacementMode(for: dimension) {
+        if await mode != xpsq8State.lastSetDisplacementMode(for: dimension) {
+          let parameters: Stage.SGammaParameters = {
+            switch mode {
+            case .large:
+              return (10, 100, 0.2, 0.2)
+            case .medium:
+              return (1, 10, 0.2, 0.2)
+            case .small:
+              return (0.1, 5, 0.2, 0.2)
+            case .fine:
+              return (0.01, 1, 0.2, 0.2)
+            }
+          }()
+          
+          try await stage(for: dimension).setSGammaParameters(parameters)
+          await setXPSQ8LastSetDisplacementMode(in: dimension, to: mode)
+        }
+      }
       try await stage(for: dimension).moveAbsolute(to: location)
 //      try await untilSuccess(times: 5) { try await updateXPSQ8Status() }
 //      await setXPSQ8Status(nil)
@@ -36,6 +56,26 @@ public extension PrinterController {
   
   func moveRelative(in dimension: Dimension, by displacement: Double) async throws {
     try await with(.xpsq8) {
+      // Make sure SGammaParameters are set
+      if let mode = await xpsq8State.displacementMode(for: dimension) {
+        if await mode != xpsq8State.lastSetDisplacementMode(for: dimension) {
+          let parameters: Stage.SGammaParameters = {
+            switch mode {
+            case .large:
+              return (10, 100, 0.2, 0.2)
+            case .medium:
+              return (1, 10, 0.2, 0.2)
+            case .small:
+              return (0.1, 5, 0.2, 0.2)
+            case .fine:
+              return (0.01, 1, 0.2, 0.2)
+            }
+          }()
+          
+          try await stage(for: dimension).setSGammaParameters(parameters)
+          await setXPSQ8LastSetDisplacementMode(in: dimension, to: mode)
+        }
+      }
       try await stage(for: dimension).moveRelative(by: displacement)
     }
   }
@@ -43,6 +83,28 @@ public extension PrinterController {
   func position(in dimension: Dimension) async throws -> Double {
     try await reading(.xpsq8) {
       try await stage(for: dimension).currentPosition
+    }
+  }
+  
+  func setSGammaParamaters(
+    in dimension: Dimension,
+    forDisplacementMode displacementMode: DisplacementMode
+  ) async throws {
+    try await with(.xpsq8) {
+      let parameters: Stage.SGammaParameters = {
+        switch displacementMode {
+        case .large:
+          return (10, 100, 0.2, 0.2)
+        case .medium:
+          return (1, 10, 0.2, 0.2)
+        case .small:
+          return (0.1, 5, 0.2, 0.2)
+        case .fine:
+          return (0.01, 1, 0.2, 0.2)
+        }
+      }()
+      
+      try await stage(for: dimension).setSGammaParameters(parameters)
     }
   }
 }
