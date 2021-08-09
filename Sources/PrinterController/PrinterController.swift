@@ -63,7 +63,9 @@ extension PrinterController {
   
   @MainActor
   func setXPSQ8Status(_ status: StageGroup.Status?) {
-    xpsq8State.groupStatus = status
+    if xpsq8State.canUpdateGroupStatus {
+      xpsq8State.groupStatus = status
+    }
   }
   
   @MainActor
@@ -76,6 +78,11 @@ extension PrinterController {
     case .z:
       xpsq8State.zPosition = position
     }
+  }
+  
+  @MainActor
+  fileprivate func setXPSQ8CanUpdateGroupState(_ value: Bool) {
+    xpsq8State.canUpdateGroupStatus = value
   }
   
   @MainActor
@@ -226,6 +233,12 @@ extension PrinterController {
       }
     }
     
+    let invalidateXPSQ8State = instruments.contains(.xpsq8) || blocked.contains(.xpsq8)
+    
+    if invalidateXPSQ8State {
+      await setXPSQ8CanUpdateGroupState(false)
+    }
+    
     for instrument in instruments {
       await setState(instrument: instrument, state: .busy)
     }
@@ -249,6 +262,10 @@ extension PrinterController {
     
     for instrument in blocked {
       await setState(instrument: instrument, state: .ready)
+    }
+    
+    if invalidateXPSQ8State {
+      await setXPSQ8CanUpdateGroupState(true)
     }
     
     return try result.get()

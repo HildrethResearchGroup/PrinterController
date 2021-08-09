@@ -9,11 +9,12 @@ import XPSQ8Kit
 import Foundation
 
 public struct XPSQ8State {
-  public var xPosition: Double?
-  public var yPosition: Double?
-  public var zPosition: Double?
-  public var groupStatus: StageGroup.Status?
   public var updateInterval: TimeInterval? = 0.2
+  
+  public internal(set) var xPosition: Double?
+  public internal(set) var yPosition: Double?
+  public internal(set) var zPosition: Double?
+  public internal(set) var groupStatus: StageGroup.Status?
   
   public var xDisplacementMode: DisplacementMode?
   public var yDisplacementMode: DisplacementMode?
@@ -22,6 +23,14 @@ public struct XPSQ8State {
   var xLastSetDisplacementMode: DisplacementMode?
   var yLastSetDisplacementMode: DisplacementMode?
   var zLastSetDisplacementMode: DisplacementMode?
+  
+  var canUpdateGroupStatus = true {
+    didSet {
+      if !canUpdateGroupStatus {
+        groupStatus = nil
+      }
+    }
+  }
 }
 
 // MARK: Helpers
