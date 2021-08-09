@@ -107,6 +107,12 @@ public extension PrinterController {
       try await stage(for: dimension).setSGammaParameters(parameters)
     }
   }
+  
+  func abortAllMoves() async throws {
+    try await with(.xpsq8) {
+      try await stageGroup.abortAllMoves()
+    }
+  }
 }
 
 // MARK: - Dimension
