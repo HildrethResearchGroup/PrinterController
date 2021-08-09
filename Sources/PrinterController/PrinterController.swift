@@ -13,13 +13,26 @@ public actor PrinterController: ObservableObject {
   var xpsq8Controller: XPSQ8Controller?
   
   @MainActor
-  @Published public var xpsq8State = InstrumentState.notConnected
+  @Published public var xpsq8ConnectionState = CommunicationState.notConnected
   
   @MainActor
-  @Published public var waveformState = InstrumentState.notConnected
+  @Published public var waveformConnectionState = CommunicationState.notConnected
+  
+  @MainActor
+  @Published public var xpsq8State = XPSQ8State()
   
   public init() {
-    
+    Task {
+      while true {
+        if await xpsq8State.updateInterval != nil {
+//          if await [CommunicationState.ready, .reading].contains(xpsq8ConnectionState) {
+            try? await updateXPSQ8Status()
+//          }
+        }
+        
+        await Task.sleep(UInt64(1e9 * (xpsq8State.updateInterval ?? 1.0)))
+      }
+    }
   }
 }
 
@@ -29,23 +42,47 @@ extension PrinterController {
     case waveform
   }
   
-  @MainActor
-  fileprivate func setState(instrument: Instrument, state: InstrumentState) {
-    switch instrument {
-    case .xpsq8:
-      xpsq8State = state
-    case .waveform:
-      waveformState = state
+  func updateXPSQ8Status() async throws {
+    try await setXPSQ8Status(stageGroup.status)
+    for dimension in Dimension.allCases {
+      try await setXPSQ8Position(in: dimension, position(in: dimension))
     }
   }
   
   @MainActor
-  fileprivate func state(for instrument: Instrument) -> InstrumentState {
+  func setXPSQ8Status(_ status: StageGroup.Status?) {
+    xpsq8State.groupStatus = status
+  }
+  
+  @MainActor
+  func setXPSQ8Position(in dimension: Dimension, _ position: Double?) {
+    switch dimension {
+    case .x:
+      xpsq8State.xPosition = position
+    case .y:
+      xpsq8State.yPosition = position
+    case .z:
+      xpsq8State.zPosition = position
+    }
+  }
+  
+  @MainActor
+  fileprivate func setState(instrument: Instrument, state: CommunicationState) {
     switch instrument {
     case .xpsq8:
-      return xpsq8State
+      xpsq8ConnectionState = state
     case .waveform:
-      return waveformState
+      waveformConnectionState = state
+    }
+  }
+  
+  @MainActor
+  fileprivate func state(for instrument: Instrument) -> CommunicationState {
+    switch instrument {
+    case .xpsq8:
+      return xpsq8ConnectionState
+    case .waveform:
+      return waveformConnectionState
     }
   }
 }
@@ -94,22 +131,69 @@ public extension PrinterController {
   }
   
   func initializeXPSQ8() async throws {
-    guard let xpsq8Controller = xpsq8Controller else { throw Error.instrumentNotConnected }
-		try await xpsq8Controller.restart()
-    try await stageGroup.waitForStatus(withCodes: [0], interval: 1.0)
-    try await print("Restarted: ", stageGroup.statusCode)
-		try await stageGroup.initialize()
-    try await stageGroup.waitForStatus(withCodes: [42])
-    try await print("Initialized: ", stageGroup.statusCode)
-    try await searchForHome()
-    try await stageGroup.waitForStatus(withCode: 11)
-    try await print("Homed: ", stageGroup.statusCode)
+//    guard let xpsq8Controller = xpsq8Controller else { throw Error.instrumentNotConnected }
+//		try await xpsq8Controller.restart()
+//    try await stageGroup.waitForStatus(.readyFromFocus)
+//    try await print("Restarted: ", stageGroup.status)
+//		try await stageGroup.initialize()
+//    
+//    try await stageGroup.waitForStatus(.notReferenced)
+//    try await print("Initialized: ", stageGroup.status)
+//    try await searchForHome()
+//    try await stageGroup.waitForStatus(.readyFromHoming)
+//    try await print("Homed: ", stageGroup.status)
     await setState(instrument: .xpsq8, state: .ready)
   }
 }
 
 // MARK: - Instrument State
 extension PrinterController {
+  func reading<T>(
+    _ instruments: Set<Instrument>,
+    perform action: () async throws -> T
+  ) async throws -> T {
+    for instrument in instruments {
+      switch await state(for: instrument) {
+      case .notConnected, .connecting:
+        throw Error.instrumentNotConnected
+      case .notInitialized:
+        throw Error.instrumentNotInitialized
+      case .busy:
+        throw Error.instrumentBusy
+      case .blocked:
+        throw Error.instrumentBlocked
+      default:
+        break
+      }
+    }
+    
+    for instrument in instruments {
+      await setState(instrument: instrument, state: .reading)
+    }
+    
+    let result: Result<T, Swift.Error>
+    
+    do {
+      let value =  try await action()
+      result = .success(value)
+    } catch {
+      result = .failure(error)
+    }
+    
+    for instrument in instruments {
+      await setState(instrument: instrument, state: .ready)
+    }
+    
+    return try result.get()
+  }
+  
+  func reading<T>(
+    _ instrument: Instrument,
+    perform action: () async throws -> T
+  ) async throws -> T {
+    try await reading([instrument], perform: action)
+  }
+  
   func with<T>(
     _ instruments: Set<Instrument>,
     blocking blocked: Set<Instrument> = [],
@@ -138,7 +222,14 @@ extension PrinterController {
       await setState(instrument: instrument, state: .blocked)
     }
     
-    let result = try await action()
+    let result: Result<T, Swift.Error>
+    
+    do {
+      let value =  try await action()
+      result = .success(value)
+    } catch {
+      result = .failure(error)
+    }
     
     for instrument in instruments {
       await setState(instrument: instrument, state: .ready)
@@ -148,7 +239,7 @@ extension PrinterController {
       await setState(instrument: instrument, state: .ready)
     }
     
-    return result
+    return try result.get()
   }
   
   func with<T>(

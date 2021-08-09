@@ -9,14 +9,14 @@ import XPSQ8Kit
 
 public extension PrinterController {
   func searchForHome() async throws {
-		switch await xpsq8State {
+		switch await xpsq8ConnectionState {
 		case .notConnected, .connecting:
 			throw Error.instrumentNotConnected
 		case .busy:
 			throw Error.instrumentBusy
 		case .blocked:
 			throw Error.instrumentBlocked
-		case .ready, .notInitialized:
+    case .ready, .notInitialized, .reading:
 			try await stageGroup.searchForHome()
 		}
 		
@@ -28,6 +28,9 @@ public extension PrinterController {
   func moveAbsolute(in dimension: Dimension, to location: Double) async throws {
     try await with(.xpsq8) {
       try await stage(for: dimension).moveAbsolute(to: location)
+//      try await untilSuccess(times: 5) { try await updateXPSQ8Status() }
+//      await setXPSQ8Status(nil)
+//      await until(await self.xpsq8State.groupStatus == .readyFromMotion)
     }
   }
   
@@ -38,7 +41,7 @@ public extension PrinterController {
   }
   
   func position(in dimension: Dimension) async throws -> Double {
-    try await with(.xpsq8) {
+    try await reading(.xpsq8) {
       try await stage(for: dimension).currentPosition
     }
   }
@@ -46,10 +49,14 @@ public extension PrinterController {
 
 // MARK: - Dimension
 public extension PrinterController {
-  enum Dimension: String, CaseIterable {
+  enum Dimension: String, CaseIterable, Identifiable {
     case x = "X"
     case y = "Y"
     case z = "Z"
+    
+    public var id: String {
+      rawValue
+    }
   }
 }
 
