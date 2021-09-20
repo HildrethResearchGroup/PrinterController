@@ -14,12 +14,17 @@ let package = Package(
   dependencies: [
     .package(url: "https://github.com/SwiftVISA/SwiftVISASwift.git", .branch("actor")),
 //    .package(url: "https://github.com/HildrethResearchGroup/XPSQ8Kit.git", .branch("actor")),
-    .package(name: "XPSQ8Kit", path: "../XPSQ8Kit")
+    .package(name: "XPSQ8Kit", path: "../XPSQ8Kit"),
+    .package(url: "https://github.com/apple/swift-collections", from: "0.0.1"),
   ],
   targets: [
     .target(
       name: "PrinterController",
-      dependencies: ["SwiftVISASwift", "XPSQ8Kit"]),
+      dependencies: [
+        "SwiftVISASwift",
+        "XPSQ8Kit",
+        .product(name: "Collections", package: "swift-collections")
+      ]),
     .testTarget(
       name: "PrinterControllerTests",
       dependencies: ["PrinterController"]),
