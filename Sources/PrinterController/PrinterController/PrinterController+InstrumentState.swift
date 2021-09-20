@@ -1,52 +1,36 @@
 //
-//  PrinterController.swift
-//  
+//  PrinterController+InstrumentState.swift
+//  PrinterController+InstrumentState
 //
-//  Created by Connor Barnes on 7/13/21.
+//  Created by Connor Barnes on 8/29/21.
 //
 
 import XPSQ8Kit
-import SwiftUI
-
-public actor PrinterController: ObservableObject {
-  var waveformController: WaveformController?
-  var xpsq8Controller: XPSQ8Controller?
-  
-  @MainActor
-  @Published public var xpsq8ConnectionState = CommunicationState.notConnected
-  
-  @MainActor
-  @Published public var waveformConnectionState = CommunicationState.notConnected
-  
-  @MainActor
-  @Published public var xpsq8State = XPSQ8State()
-  
-  public init() {
-    Task {
-      while true {
-        if await xpsq8State.updateInterval != nil {
-//          if await [CommunicationState.ready, .reading].contains(xpsq8ConnectionState) {
-            try? await updateXPSQ8Status()
-//          }
-        }
-        
-        await Task.sleep(UInt64(1e9 * (xpsq8State.updateInterval ?? 1.0)))
-      }
-    }
-  }
-}
 
 extension PrinterController {
-  enum Instrument {
-    case xpsq8
-    case waveform
-  }
-  
-  func updateXPSQ8Status() async throws {
+  func updateXPSQ8State() async throws {
     try await setXPSQ8Status(stageGroup.status)
     for dimension in Dimension.allCases {
       try await setXPSQ8Position(in: dimension, position(in: dimension))
     }
+  }
+  
+  func updateWaveformState() async throws {
+    try await setWaveformState(\.voltage, to: waveformController?.voltage)
+    try await setWaveformState(\.voltageOffset, to: waveformController?.voltageOffset)
+    try await setWaveformState(\.frequency, to: waveformController?.frequency)
+    try await setWaveformState(\.phase, to: waveformController?.phase)
+    try await setWaveformState(\.waveFunction, to: waveformController?.waveFunction)
+  }
+  
+  @MainActor
+  func setWaveformState<T>(_ keypath: WritableKeyPath<WaveformState, T>, to value: T) {
+    waveformState[keyPath: keypath] = value
+  }
+  
+  @MainActor
+  func setPrinterQueueState<T>(_ keypath: WritableKeyPath<PrinterQueueState, T>, to value: T) {
+    printerQueueState[keyPath: keypath] = value
   }
   
   @MainActor
@@ -81,12 +65,12 @@ extension PrinterController {
   }
   
   @MainActor
-  fileprivate func setXPSQ8CanUpdateGroupState(_ value: Bool) {
+  func setXPSQ8CanUpdateGroupState(_ value: Bool) {
     xpsq8State.canUpdateGroupStatus = value
   }
   
   @MainActor
-  fileprivate func setState(instrument: Instrument, state: CommunicationState) {
+  func setState(instrument: Instrument, state: CommunicationState) {
     switch instrument {
     case .xpsq8:
       xpsq8ConnectionState = state
@@ -96,7 +80,7 @@ extension PrinterController {
   }
   
   @MainActor
-  fileprivate func state(for instrument: Instrument) -> CommunicationState {
+  func state(for instrument: Instrument) -> CommunicationState {
     switch instrument {
     case .xpsq8:
       return xpsq8ConnectionState
@@ -106,66 +90,7 @@ extension PrinterController {
   }
 }
 
-// MARK: - Connecting to Instruments
-public extension PrinterController {
-  func connectToWaveform(configuration: WaveformConfiguration) async throws {
-    do {
-      await setState(instrument: .waveform, state: .connecting)
-      sleep(1)
-      waveformController = try await configuration.makeInstrument()
-      await setState(instrument: .waveform, state: .notInitialized)
-    } catch {
-      await setState(instrument: .waveform, state: .notConnected)
-      throw error
-    }
-  }
-  
-  func connectToXPSQ8(configuration: XPSQ8Configuration) async throws {
-    do {
-      await setState(instrument: .xpsq8, state: .connecting)
-      xpsq8Controller = try await configuration.makeInstrument()
-      await setState(instrument: .xpsq8, state: .notInitialized)
-    } catch {
-      await setState(instrument: .xpsq8, state: .notConnected)
-      throw error
-    }
-  }
-  
-  func disconnectFromWaveform() async {
-    waveformController = nil
-    await setState(instrument: .waveform, state: .notConnected)
-  }
-  
-  func disconnectFromXPSQ8() async {
-    xpsq8Controller = nil
-    await setState(instrument: .waveform, state: .notConnected)
-  }
-}
-
-// MARK: - Initializing Instruments
-public extension PrinterController {
-  func initializeWaveform() async throws {
-    // TODO: Implement
-    await setState(instrument: .waveform, state: .ready)
-  }
-  
-  func initializeXPSQ8() async throws {
-//    guard let xpsq8Controller = xpsq8Controller else { throw Error.instrumentNotConnected }
-//		try await xpsq8Controller.restart()
-//    try await stageGroup.waitForStatus(.readyFromFocus)
-//    try await print("Restarted: ", stageGroup.status)
-//		try await stageGroup.initialize()
-//    
-//    try await stageGroup.waitForStatus(.notReferenced)
-//    try await print("Initialized: ", stageGroup.status)
-//    try await searchForHome()
-//    try await stageGroup.waitForStatus(.readyFromHoming)
-//    try await print("Homed: ", stageGroup.status)
-    await setState(instrument: .xpsq8, state: .ready)
-  }
-}
-
-// MARK: - Instrument State
+// MARK: - Instrument State Management
 extension PrinterController {
   func reading<T>(
     _ instruments: Set<Instrument>,
