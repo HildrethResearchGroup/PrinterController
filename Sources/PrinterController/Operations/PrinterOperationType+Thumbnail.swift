@@ -10,6 +10,8 @@ extension PrinterOperationType {
     switch self {
     case .voltageToggle(_):
       return "bolt.fill"
+    case .waveformSettings(_):
+      return "waveform.path"
     }
   }
 }

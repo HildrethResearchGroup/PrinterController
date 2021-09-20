@@ -22,12 +22,15 @@ public struct PrinterOperation: Identifiable, Hashable, Codable {
     switch operationType {
     case .voltageToggle(let configuration):
       try await configuration.run(printerController: printerController)
+    case .waveformSettings(let configuration):
+      try await configuration.run(printerController: printerController)
     }
   }
   
   public static var allEmptyOperations: [PrinterOperation] {
     [
-      .init(operationType: .voltageToggle(.init()))
+      .init(operationType: .voltageToggle(.init())),
+      .init(operationType: .waveformSettings(.init()))
     ]
   }
 }
@@ -35,6 +38,7 @@ public struct PrinterOperation: Identifiable, Hashable, Codable {
 // MARK: - PrinterOperationType
 public enum PrinterOperationType: Hashable, Codable {
   case voltageToggle (VoltageToggleConfiguration)
+  case waveformSettings (WaveformSettingsConfiguration)
 }
 
 // MARK: - PrinterOperationConfiguration

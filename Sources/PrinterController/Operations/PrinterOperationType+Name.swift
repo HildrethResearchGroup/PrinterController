@@ -10,6 +10,8 @@ extension PrinterOperationType {
     switch self {
     case .voltageToggle(_):
       return "Voltage Toggle"
+    case .waveformSettings(_):
+      return "Waveform Settings"
     }
   }
 }
