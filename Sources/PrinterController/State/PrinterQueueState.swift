@@ -6,9 +6,9 @@
 //
 
 public struct PrinterQueueState {
-  public internal(set) var queue: [PrinterOperation] = []
+  public var queue: [PrinterOperation] = []
   public internal(set) var operationIndex: Int?
-  public internal(set) var running: Bool = false
+  public internal(set) var isRunning: Bool = false
   
   var task: Task<Void, Never>?
 }

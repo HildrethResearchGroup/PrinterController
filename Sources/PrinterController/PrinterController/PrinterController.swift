@@ -13,9 +13,6 @@ public actor PrinterController: ObservableObject {
   var xpsq8Controller: XPSQ8Controller?
   
   @MainActor
-  @Published public var printerQueue: PrinterQueue?
-  
-  @MainActor
   @Published public var xpsq8ConnectionState = CommunicationState.notConnected
   
   @MainActor

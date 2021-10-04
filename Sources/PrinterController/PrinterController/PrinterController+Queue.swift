@@ -13,8 +13,4 @@ public extension PrinterController {
   func pauseQueue() async throws {
     
   }
-  
-  func setQueue(to queue: PrinterQueue) async throws {
-    
-  }
 }
