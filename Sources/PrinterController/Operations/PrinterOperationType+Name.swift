@@ -12,6 +12,8 @@ extension PrinterOperationType {
       return "Voltage Toggle"
     case .waveformSettings(_):
       return "Waveform Settings"
+    case .comment(let configuration):
+      return configuration.comment
     }
   }
 }

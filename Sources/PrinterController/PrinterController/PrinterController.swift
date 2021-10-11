@@ -33,7 +33,7 @@ public actor PrinterController: ObservableObject {
   public init() {
     Task {
       await withTaskGroup(of: Void.self) { taskGroup in
-        taskGroup.async {
+        taskGroup.addTask {
           while true {
             try? await self.updateWaveformState()
             try? await self.updateXPSQ8State()

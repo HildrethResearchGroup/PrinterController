@@ -12,6 +12,8 @@ extension PrinterOperationType {
       return "bolt.fill"
     case .waveformSettings(_):
       return "waveform.path"
+    case.comment(_):
+      return "text.bubble.fill"
     }
   }
 }

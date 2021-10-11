@@ -10,6 +10,7 @@ import SwiftUI
 public struct PrinterOperation: Identifiable, Hashable, Codable {
   public var operationType: PrinterOperationType
   public var continueOnError = false
+  public var isEnabled = true
   public let id: UUID
   
   public init(operationType: PrinterOperationType, continueOnError: Bool = false) {
@@ -24,13 +25,16 @@ public struct PrinterOperation: Identifiable, Hashable, Codable {
       try await configuration.run(printerController: printerController)
     case .waveformSettings(let configuration):
       try await configuration.run(printerController: printerController)
+    case .comment(let configuration):
+      try await configuration.run(printerController: printerController)
     }
   }
   
   public static var allEmptyOperations: [PrinterOperation] {
     [
       .init(operationType: .voltageToggle(.init())),
-      .init(operationType: .waveformSettings(.init()))
+      .init(operationType: .waveformSettings(.init())),
+      .init(operationType: .comment(.init()))
     ]
   }
 }
@@ -39,6 +43,7 @@ public struct PrinterOperation: Identifiable, Hashable, Codable {
 public enum PrinterOperationType: Hashable, Codable {
   case voltageToggle (VoltageToggleConfiguration)
   case waveformSettings (WaveformSettingsConfiguration)
+  case comment (CommentConfiguration)
 }
 
 // MARK: - PrinterOperationConfiguration
