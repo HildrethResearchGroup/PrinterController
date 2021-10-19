@@ -7,49 +7,47 @@
 
 import SwiftUI
 
-public struct PrinterOperation: Identifiable, Hashable, Codable {
-  public var operationType: PrinterOperationType
-  public var continueOnError = false
+public struct PrinterOperation<Configuration: Codable & Hashable, Body: View>: Identifiable {
+  public let kind: AnyPrinterOperation.Kind
+  public var configuration: Configuration
   public var isEnabled = true
-  public let id: UUID
+  public var continueOnError = false
+  public let id = UUID()
   
-  public init(operationType: PrinterOperationType, continueOnError: Bool = false) {
-    self.operationType = operationType
-    self.continueOnError = continueOnError
-    id = UUID()
+  let name: (Configuration) -> String
+  let thumbnailName: (Configuration) -> String
+  let run: (Configuration, PrinterController) async throws -> Void
+  let body: (Binding<Configuration>) -> Body
+  
+  init(
+    kind: AnyPrinterOperation.Kind,
+    configuration: Configuration,
+    name: String,
+    thumbnailName: String,
+    body: @escaping (Binding<Configuration>) -> Body,
+    run: @escaping (Configuration, PrinterController) async throws -> Void
+  ) {
+    self.kind = kind
+    self.configuration = configuration
+    self.name = { _ in name}
+    self.thumbnailName = { _ in thumbnailName }
+    self.run = run
+    self.body = body
   }
   
-  func run(printerController: PrinterController) async throws {
-    switch operationType {
-    case .voltageToggle(let configuration):
-      try await configuration.run(printerController: printerController)
-    case .waveformSettings(let configuration):
-      try await configuration.run(printerController: printerController)
-    case .comment(let configuration):
-      try await configuration.run(printerController: printerController)
-    }
+  init(
+    kind: AnyPrinterOperation.Kind,
+    configuration: Configuration,
+    body: @escaping (Binding<Configuration>) -> Body,
+    run: @escaping (Configuration, PrinterController) async throws -> Void,
+    name: @escaping (Configuration) -> String,
+    thumbnailName: @escaping (Configuration) -> String
+  ) {
+    self.kind = kind
+    self.configuration = configuration
+    self.name = name
+    self.thumbnailName = thumbnailName
+    self.run = run
+    self.body = body
   }
-  
-  public static var allEmptyOperations: [PrinterOperation] {
-    [
-      .init(operationType: .voltageToggle(.init())),
-      .init(operationType: .waveformSettings(.init())),
-      .init(operationType: .comment(.init()))
-    ]
-  }
-}
-
-// MARK: - PrinterOperationType
-public enum PrinterOperationType: Hashable, Codable {
-  case voltageToggle (VoltageToggleConfiguration)
-  case waveformSettings (WaveformSettingsConfiguration)
-  case comment (CommentConfiguration)
-}
-
-// MARK: - PrinterOperationConfiguration
-/// An internal protocol to guarantee that each operation's configuration has the necessary behavior
-protocol PrinterOperationConfiguration: Hashable, Codable {
-  func run(printerController: PrinterController) async throws
-  
-  init()
 }

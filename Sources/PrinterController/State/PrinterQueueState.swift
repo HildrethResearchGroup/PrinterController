@@ -6,7 +6,7 @@
 //
 
 public struct PrinterQueueState {
-  public var queue: [PrinterOperation] = []
+  public var queue: [AnyPrinterOperation] = []
   public internal(set) var operationIndex: Int?
   public internal(set) var isRunning: Bool = false
   

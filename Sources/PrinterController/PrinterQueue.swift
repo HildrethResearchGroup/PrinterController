@@ -8,13 +8,13 @@
 import Foundation
 import Collections
 
-public struct PrinterQueue {
-  public var queue: [PrinterOperation] = []
-}
-
-// MARK: - Error
-extension PrinterQueue {
-  enum Error: Swift.Error {
-    case queueRunning
-  }
-}
+//public struct PrinterQueue {
+//  public var queue: [PrinterOperation] = []
+//}
+//
+//// MARK: - Error
+//extension PrinterQueue {
+//  enum Error: Swift.Error {
+//    case queueRunning
+//  }
+//}
