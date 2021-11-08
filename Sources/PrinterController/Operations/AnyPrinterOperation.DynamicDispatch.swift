@@ -76,6 +76,26 @@ extension AnyPrinterOperation {
         
         return AnyView(operation.body(binding))
       }
+			
+			_encodeClosure[kind] = { kind, configuration, isEnabled, continueOnError, id, encoder in
+				let storage = PrinterOperation<Configuration, Body>.Storage(
+					kind: kind,
+					configuration: configuration as! Configuration,
+					isEnabled: isEnabled,
+					continueOnError: continueOnError,
+					id: id
+				)
+				try storage.encode(to: encoder)
+			}
+			
+			_decodeClosure[kind] = { decoder in
+				let storage = try PrinterOperation<Configuration, Body>.Storage(from: decoder)
+				return AnyPrinterOperation(kind: storage.kind,
+																	 configuration: storage.configuration,
+																	 isEnabled: storage.isEnabled,
+																	 continueOnError: storage.continueOnError,
+																	 id: storage.id)
+			}
       
       _empty[kind] = operation.configuration
       _registered.insert(kind)

@@ -51,3 +51,15 @@ public struct PrinterOperation<Configuration: Codable & Hashable, Body: View>: I
     self.body = body
   }
 }
+
+extension PrinterOperation {
+	struct Storage: Codable {
+		var kind: AnyPrinterOperation.Kind
+		var configuration: Configuration
+		var isEnabled: Bool
+		var continueOnError: Bool
+		var id: UUID
+	}
+	
+	
+}
