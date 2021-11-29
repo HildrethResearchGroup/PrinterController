@@ -30,7 +30,7 @@ public actor PrinterController: ObservableObject {
   @MainActor
   @Published public var updateInterval: TimeInterval? = 0.2
   
-  public init() {
+  public init() async {
     Task {
       await withTaskGroup(of: Void.self) { taskGroup in
         taskGroup.addTask {
@@ -43,6 +43,14 @@ public actor PrinterController: ObservableObject {
       }
     }
   }
+	
+	private init() {
+		
+	}
+	
+	public static var staticPreview: PrinterController {
+		.init()
+	}
 }
 
 // MARK: - Connecting to Instruments

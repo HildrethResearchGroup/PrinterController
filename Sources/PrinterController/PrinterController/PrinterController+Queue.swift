@@ -5,6 +5,8 @@
 //  Created by Connor Barnes on 8/29/21.
 //
 
+import Foundation
+
 public extension PrinterController {
   func resumeQueue() async {
     await setPrinterQueueState(\.isRunning, to: true)
@@ -46,4 +48,35 @@ public extension PrinterController {
   func pauseQueue() async {
     await printerQueueState.task?.cancel()
   }
+	
+	func waitForModal(withComment comment: String) async throws {
+		await setPrinterQueueState(\.modalComment, to: comment)
+		
+		while await printerQueueState.modalComment != nil {
+			try await Task.sleep(nanoseconds: 100_000_000)
+		}
+	}
+	
+	func wait(for numberOfSeconds: TimeInterval) async throws {
+		let start = Date()
+		await setPrinterQueueState(\.waitingTimeRemaining, to: numberOfSeconds)
+		
+		while true {
+			// The user can choose to stop waiting at any time, check if they have done so
+			if await printerQueueState.waitingTimeRemaining == nil {
+				return
+			}
+			
+			let timeElapsed = Date().timeIntervalSince(start)
+			let timeRemaining = numberOfSeconds - timeElapsed
+			if timeRemaining < 0 {
+				await setPrinterQueueState(\.waitingTimeRemaining, to: nil)
+				return
+			}
+			
+			await setPrinterQueueState(\.waitingTimeRemaining, to: timeRemaining)
+			
+			try await Task.sleep(nanoseconds: UInt64(10_000_000))
+		}
+	}
 }

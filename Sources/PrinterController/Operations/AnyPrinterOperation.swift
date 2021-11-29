@@ -92,6 +92,10 @@ extension AnyPrinterOperation {
     case comment
     case voltageToggle
     case waveformSettings
+		case home
+		case alert
+		case wait
+		case move
   }
 }
 
