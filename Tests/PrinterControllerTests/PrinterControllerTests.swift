@@ -2,8 +2,9 @@ import XCTest
 @testable import PrinterController
 
 final class PrinterControllerTests: XCTestCase {
-  let waveformConfiguration = WaveformConfiguration(address: "192.168.1.3", port: 5025)
+  let waveformConfiguration = VISAEthernetConfiguration(address: "192.168.1.3", port: 5025)
   let xpsq8Configuration = XPSQ8Configuration(address: "192.168.1.4", port: 5001)
+	let multimeterConfiguration = VISAEthernetConfiguration(address: "192.168.1.5", port: 5025)
   
   func testWaveformConnection() async {
     let controller = await PrinterController()
@@ -40,6 +41,24 @@ final class PrinterControllerTests: XCTestCase {
       XCTFail("Could not reconnect to XPS-Q8.")
     }
   }
+	
+	func testMultimeterConnection() async {
+		let controller = await PrinterController()
+		
+		do {
+			try await controller.connectToMultimeter(configuration: multimeterConfiguration)
+		} catch {
+			XCTFail("Could not connect to multimeter.")
+		}
+		
+		await controller.disconnectFromMultimeter()
+		
+		do {
+			try await controller.connectToMultimeter(configuration: multimeterConfiguration)
+		} catch {
+			XCTFail("Could not reconnect to multimeter.")
+		}
+	}
 }
 
 // MARK: - Unsafe Wait For

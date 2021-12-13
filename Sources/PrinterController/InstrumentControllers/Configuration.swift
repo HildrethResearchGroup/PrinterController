@@ -10,7 +10,7 @@ import SwiftVISASwift
 import XPSQ8Kit
 
 // MARK: - Waveform Configuration
-public struct WaveformConfiguration {
+public struct VISAEthernetConfiguration {
   public var address: String
   public var port: Int
   public var timeout: TimeInterval = 5.0
@@ -28,18 +28,18 @@ public struct WaveformConfiguration {
     self.attributes = attributes
   }
   
-  public static var empty: WaveformConfiguration {
+  public static var empty: VISAEthernetConfiguration {
     return .init(address: "0.0.0.0", port: 5025)
   }
   
-  func makeInstrument() async throws -> WaveformController {
+  func makeInstrument() async throws -> MessageBasedInstrument {
     var instrument = try await InstrumentManager.shared.instrumentAt(
       address: address,
       port: port,
       timeout: timeout
     )
     instrument.attributes = attributes
-    return WaveformController(instrument: instrument)
+    return instrument
   }
 }
 

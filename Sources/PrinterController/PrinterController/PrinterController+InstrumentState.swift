@@ -22,6 +22,10 @@ extension PrinterController {
     try await setWaveformState(\.phase, to: waveformController?.phase)
     try await setWaveformState(\.waveFunction, to: waveformController?.waveFunction)
   }
+	
+	func updateMultimeterState() async throws {
+		// TODO: Implement
+	}
   
   @MainActor
   func setWaveformState<T>(_ keypath: WritableKeyPath<WaveformState, T>, to value: T) {
@@ -76,6 +80,8 @@ extension PrinterController {
       xpsq8ConnectionState = state
     case .waveform:
       waveformConnectionState = state
+		case .multimeter:
+			multimeterConnectionState = state
     }
   }
   
@@ -86,6 +92,8 @@ extension PrinterController {
       return xpsq8ConnectionState
     case .waveform:
       return waveformConnectionState
+		case .multimeter:
+			return multimeterConnectionState
     }
   }
 }

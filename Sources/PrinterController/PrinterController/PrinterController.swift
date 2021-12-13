@@ -9,20 +9,27 @@ import XPSQ8Kit
 import SwiftUI
 
 public actor PrinterController: ObservableObject {
+	var xpsq8Controller: XPSQ8Controller?
   var waveformController: WaveformController?
-  var xpsq8Controller: XPSQ8Controller?
+	var multimeterController: MultimeterController?
   
   @MainActor
   @Published public var xpsq8ConnectionState = CommunicationState.notConnected
   
   @MainActor
   @Published public var waveformConnectionState = CommunicationState.notConnected
+	
+	@MainActor
+	@Published public var multimeterConnectionState = CommunicationState.notConnected
   
   @MainActor
   @Published public var xpsq8State = XPSQ8State()
   
   @MainActor
   @Published public var waveformState = WaveformState()
+	
+	@MainActor
+	@Published public var multimeterState = MultimeterState()
   
   @MainActor
   @Published public var printerQueueState = PrinterQueueState()
@@ -35,8 +42,9 @@ public actor PrinterController: ObservableObject {
       await withTaskGroup(of: Void.self) { taskGroup in
         taskGroup.addTask {
           while true {
+						try? await self.updateXPSQ8State()
             try? await self.updateWaveformState()
-            try? await self.updateXPSQ8State()
+						try? await self.updateMultimeterState()
             await Task.sleep(UInt64(1e9 * (self.updateInterval ?? 1.0)))
           }
         }
@@ -55,11 +63,11 @@ public actor PrinterController: ObservableObject {
 
 // MARK: - Connecting to Instruments
 public extension PrinterController {
-  func connectToWaveform(configuration: WaveformConfiguration) async throws {
+  func connectToWaveform(configuration: VISAEthernetConfiguration) async throws {
     do {
       await setState(instrument: .waveform, state: .connecting)
       sleep(1)
-      waveformController = try await configuration.makeInstrument()
+      waveformController = try await WaveformController(instrument: configuration.makeInstrument())
       await setState(instrument: .waveform, state: .notInitialized)
     } catch {
       await setState(instrument: .waveform, state: .notConnected)
@@ -77,6 +85,18 @@ public extension PrinterController {
       throw error
     }
   }
+	
+	func connectToMultimeter(configuration: VISAEthernetConfiguration) async throws {
+		do {
+			await setState(instrument: .multimeter, state: .connecting)
+			sleep(1)
+			multimeterController = try await MultimeterController(instrument: configuration.makeInstrument())
+			await setState(instrument: .multimeter, state: .notInitialized)
+		} catch {
+			await setState(instrument: .multimeter, state: .notConnected)
+			throw error
+		}
+	}
   
   func disconnectFromWaveform() async {
     waveformController = nil
@@ -87,6 +107,11 @@ public extension PrinterController {
     xpsq8Controller = nil
     await setState(instrument: .waveform, state: .notConnected)
   }
+	
+	func disconnectFromMultimeter() async {
+		multimeterController = nil
+		await setState(instrument: .multimeter, state: .notConnected)
+	}
 }
 
 // MARK: - Initializing Instruments
@@ -110,4 +135,9 @@ public extension PrinterController {
 //    try await print("Homed: ", stageGroup.status)
     await setState(instrument: .xpsq8, state: .ready)
   }
+	
+	func initializeMultimeter() async throws {
+		// TODO: Implement
+		await setState(instrument: .multimeter, state: .ready)
+	}
 }
