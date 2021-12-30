@@ -35,7 +35,7 @@ public actor PrinterController: ObservableObject {
   @Published public var printerQueueState = PrinterQueueState()
   
   @MainActor
-  @Published public var updateInterval: TimeInterval? = 0.2
+	@Published public var updateInterval: TimeInterval? = 0.2
   
   public init() async {
     Task {
@@ -43,9 +43,9 @@ public actor PrinterController: ObservableObject {
         taskGroup.addTask {
           while true {
 						try? await self.updateXPSQ8State()
-            try? await self.updateWaveformState()
-						try? await self.updateMultimeterState()
-            await Task.sleep(UInt64(1e9 * (self.updateInterval ?? 1.0)))
+//            try? await self.updateWaveformState()
+//						try? await self.updateMultimeterState()
+						try? await Task.sleep(nanoseconds: UInt64(1e9 * (self.updateInterval ?? 1.0)))
           }
         }
       }

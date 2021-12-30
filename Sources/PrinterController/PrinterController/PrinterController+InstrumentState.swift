@@ -8,6 +8,15 @@
 import XPSQ8Kit
 
 extension PrinterController {
+	func waitFor(xpsq8Status: XPSQ8Kit.StageGroup.Status) async {
+		await setXPSQ8Status(nil)
+		while await xpsq8State.groupStatus != xpsq8Status {
+			try? await Task.sleep(nanoseconds: UInt64(1e8))
+		}
+		
+		try? await Task.sleep(nanoseconds: UInt64(1e6))
+	}
+	
   func updateXPSQ8State() async throws {
     try await setXPSQ8Status(stageGroup.status)
     for dimension in Dimension.allCases {

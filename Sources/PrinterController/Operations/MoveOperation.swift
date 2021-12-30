@@ -27,14 +27,19 @@ extension PrinterOperation {
 			thumbnailName: "move.3d",
 			body: body
 		) { configuration, printerController in
+			let locations = zip([PrinterController.Dimension.x, .y, .z],
+													[configuration.x, configuration.y, configuration.z])
+			
 			if configuration.isAbsolute {
-				try await printerController.moveAbsolute(in: .x, to: configuration.x)
-				try await printerController.moveAbsolute(in: .y, to: configuration.y)
-				try await printerController.moveAbsolute(in: .z, to: configuration.z)
+				for (dimension, position) in locations {
+					try await printerController.moveAbsolute(in: dimension, to: position)
+					await printerController.waitFor(xpsq8Status: .readyFromMotion)
+				}
 			} else {
-				try await printerController.moveRelative(in: .x, by: configuration.x)
-				try await printerController.moveRelative(in: .y, by: configuration.y)
-				try await printerController.moveRelative(in: .z, by: configuration.z)
+				for (dimension, position) in locations {
+					try await printerController.moveRelative(in: dimension, by: position)
+					await printerController.waitFor(xpsq8Status: .readyFromMotion)
+				}
 			}
 		}
 	}
