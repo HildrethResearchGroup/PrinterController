@@ -20,7 +20,7 @@ public extension PrinterController {
         if Task.isCancelled {
           break
         }
-        
+				
         let operation = await printerQueueState.queue[printerQueueState.operationIndex!]
         
         if operation.isEnabled {
