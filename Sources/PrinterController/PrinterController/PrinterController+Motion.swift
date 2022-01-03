@@ -43,11 +43,11 @@ public extension PrinterController {
             }
           }()
           
-          try await stage(for: dimension).setSGammaParameters(parameters)
+          try await writeStage(for: dimension).setSGammaParameters(parameters)
           await setXPSQ8LastSetDisplacementMode(in: dimension, to: mode)
         }
       }
-      try await stage(for: dimension).moveAbsolute(to: location)
+      try await writeStage(for: dimension).moveAbsolute(to: location)
 //      try await untilSuccess(times: 5) { try await updateXPSQ8Status() }
 //      await setXPSQ8Status(nil)
 //      await until(await self.xpsq8State.groupStatus == .readyFromMotion)
@@ -72,17 +72,17 @@ public extension PrinterController {
             }
           }()
           
-          try await stage(for: dimension).setSGammaParameters(parameters)
+          try await writeStage(for: dimension).setSGammaParameters(parameters)
           await setXPSQ8LastSetDisplacementMode(in: dimension, to: mode)
         }
       }
-      try await stage(for: dimension).moveRelative(by: displacement)
+      try await writeStage(for: dimension).moveRelative(by: displacement)
     }
   }
   
   func position(in dimension: Dimension) async throws -> Double {
     try await reading(.xpsq8) {
-      try await stage(for: dimension).currentPosition
+      try await readStage(for: dimension).currentPosition
     }
   }
   
@@ -104,7 +104,7 @@ public extension PrinterController {
         }
       }()
       
-      try await stage(for: dimension).setSGammaParameters(parameters)
+      try await writeStage(for: dimension).setSGammaParameters(parameters)
     }
   }
   
@@ -131,16 +131,34 @@ public extension PrinterController {
 // MARK: Stage Groups
 extension PrinterController {
   var stageGroup: StageGroup {
-    get throws {
-      guard let controller = xpsq8Controller else {
+    get async throws {
+			guard let controller = xpsq8CollectiveController else {
         throw Error.instrumentNotConnected
       }
       
-      return try controller.makeStageGroup(named: "M")
+			return try await controller.readController(for: "M").makeStageGroup(named: "M")
     }
   }
   
-  func stage(for dimension: Dimension) throws -> Stage {
-    try stageGroup.makeStage(named: dimension.rawValue)
+  func readStage(for dimension: Dimension) async throws -> Stage {
+		guard let collectiveController = xpsq8CollectiveController else {
+			throw Error.instrumentNotConnected
+		}
+		
+		return try await collectiveController
+			.readController(for: "M.\(dimension.rawValue)")
+			.makeStageGroup(named: "M")
+			.makeStage(named: dimension.rawValue)
   }
+	
+	func writeStage(for dimension: Dimension) async throws -> Stage {
+		guard let collectiveController = xpsq8CollectiveController else {
+			throw Error.instrumentNotConnected
+		}
+		
+		return try await collectiveController
+			.writeController(for: "M.\(dimension.rawValue)")
+			.makeStageGroup(named: "M")
+			.makeStage(named: dimension.rawValue)
+	}
 }

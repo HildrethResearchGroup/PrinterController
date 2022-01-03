@@ -63,7 +63,7 @@ public struct XPSQ8Configuration: Sendable {
     return .init(address: "0.0.0.0", port: 5001)
   }
   
-  func makeInstrument() async throws -> XPSQ8Controller {
-    try await XPSQ8Controller(address: address, port: port, timeout: timeout)
+  func makeInstrument() async throws -> XPSQ8CollectiveController {
+    try await XPSQ8CollectiveController(address: address, port: port, timeout: timeout)
   }
 }

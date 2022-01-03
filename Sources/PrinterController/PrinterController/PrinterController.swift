@@ -9,9 +9,10 @@ import XPSQ8Kit
 import SwiftUI
 
 public actor PrinterController: ObservableObject {
-	var xpsq8Controller: XPSQ8Controller?
+//	var xpsq8Controller: XPSQ8Controller?
   var waveformController: WaveformController?
 	var multimeterController: MultimeterController?
+	var xpsq8CollectiveController: XPSQ8CollectiveController?
   
   @MainActor
   @Published public var xpsq8ConnectionState = CommunicationState.notConnected
@@ -78,7 +79,7 @@ public extension PrinterController {
   func connectToXPSQ8(configuration: XPSQ8Configuration) async throws {
     do {
       await setState(instrument: .xpsq8, state: .connecting)
-      xpsq8Controller = try await configuration.makeInstrument()
+      xpsq8CollectiveController = try await configuration.makeInstrument()
       await setState(instrument: .xpsq8, state: .notInitialized)
     } catch {
       await setState(instrument: .xpsq8, state: .notConnected)
@@ -104,7 +105,7 @@ public extension PrinterController {
   }
   
   func disconnectFromXPSQ8() async {
-    xpsq8Controller = nil
+    xpsq8CollectiveController = nil
     await setState(instrument: .waveform, state: .notConnected)
   }
 	
