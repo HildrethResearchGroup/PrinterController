@@ -117,7 +117,7 @@ public extension PrinterController {
 
 // MARK: - Dimension
 public extension PrinterController {
-  enum Dimension: String, CaseIterable, Identifiable {
+  enum Dimension: String, CaseIterable, Codable, Hashable, Identifiable {
     case x = "X"
     case y = "Y"
     case z = "Z"

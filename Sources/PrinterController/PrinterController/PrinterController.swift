@@ -44,11 +44,21 @@ public actor PrinterController: ObservableObject {
         taskGroup.addTask {
           while true {
 						try? await self.updateXPSQ8State()
-//            try? await self.updateWaveformState()
-//						try? await self.updateMultimeterState()
 						try? await Task.sleep(nanoseconds: UInt64(1e9 * (self.updateInterval ?? 1.0)))
           }
         }
+				
+				taskGroup.addTask {
+					while true {
+						try? await self.updateWaveformState()
+						try? await Task.sleep(nanoseconds: UInt64(1e9 * (self.updateInterval ?? 1.0)))
+					}
+				}
+				
+				taskGroup.addTask {
+					try? await self.updateMultimeterState()
+					try? await Task.sleep(nanoseconds: UInt64(1e9 * (self.updateInterval ?? 1.0)))
+				}
       }
     }
   }
