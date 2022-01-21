@@ -96,6 +96,7 @@ extension AnyPrinterOperation {
 		case alert
 		case wait
 		case move
+		case printLine
   }
 }
 
