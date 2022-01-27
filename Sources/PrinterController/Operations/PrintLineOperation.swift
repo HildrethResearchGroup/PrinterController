@@ -28,7 +28,7 @@ extension PrinterOperation {
 			body: body
 		) { configuration, printerController in
 			let startingPosition = try await printerController.position(in: configuration.dimension)
-			try await printerController.setVoltage(to: configuration.voltage)
+			try await printerController.setVoltageOffset(to: configuration.voltage)
 			
 			for _ in 0..<configuration.numberOfLayers {
 				try await printerController.moveAbsolute(in: configuration.dimension, to: startingPosition)
