@@ -15,6 +15,7 @@ public struct WaveformState {
   public internal(set) var frequency: Double?
   public internal(set) var phase: Double?
   public internal(set) var waveFunction: WaveFunction?
+	public internal(set) var impedance: Double?
 	
 	public var amplifiedVoltage: Double? {
 		rawVoltage.flatMap { $0 * 1000 }

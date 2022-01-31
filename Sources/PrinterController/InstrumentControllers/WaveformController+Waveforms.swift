@@ -54,6 +54,12 @@ extension WaveformController {
       }
     }
   }
+	
+	var impedance: Double {
+		get async throws {
+			try await instrument.query("OUTPUT1:LOAD?", as: Double.self)
+		}
+	}
   
   func setRawVoltage(to voltage: Double) async throws {
     try await instrument.write("VOLT \(voltage)")
@@ -68,7 +74,7 @@ extension WaveformController {
 	}
 	
 	func setAmplifiedVoltageOffset(to offset: Double) async throws {
-		try await setRawVoltage(to: offset / 1000)
+		try await setRawVoltageOffset(to: offset / 1000)
 	}
   
   func setFrequency(to frequency: Double) async throws {
@@ -82,6 +88,11 @@ extension WaveformController {
   func setWaveFunction(to waveFunction: WaveFunction) async throws {
     try await instrument.write("FUNC \(waveFunction.rawValue)")
   }
+	
+	func setImpedance(to impedance: Double) async throws {
+		let string = impedance == .infinity ? "INF" : "\(impedance)"
+		try await instrument.write("OUTPUT1:LOAD \(string)")
+	}
   
   func turnVoltageOn() async throws {
     try await instrument.write("OUTPUT ON")

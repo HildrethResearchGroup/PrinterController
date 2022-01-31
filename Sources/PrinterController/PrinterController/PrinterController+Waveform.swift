@@ -28,7 +28,7 @@ public extension PrinterController {
 	
 	func setAmplifiedVoltageOffset(to offset: Double) async throws {
 		try await with(.waveform) {
-			try await waveformController?.setRawVoltageOffset(to: offset)
+			try await waveformController?.setAmplifiedVoltageOffset(to: offset)
 		}
 	}
   
@@ -49,6 +49,12 @@ public extension PrinterController {
       try await waveformController?.setWaveFunction(to: waveFunction)
     }
   }
+	
+	func setImpedance(to impedance: Double) async throws {
+		try await with(.waveform) {
+			try await waveformController?.setImpedance(to: impedance)
+		}
+	}
   
   func turnVoltageOn() async throws {
     try await with(.waveform) {

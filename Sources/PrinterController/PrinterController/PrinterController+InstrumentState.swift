@@ -31,6 +31,7 @@ extension PrinterController {
     try await setWaveformState(\.frequency, to: waveformController?.frequency)
     try await setWaveformState(\.phase, to: waveformController?.phase)
     try await setWaveformState(\.waveFunction, to: waveformController?.waveFunction)
+		try await setWaveformState(\.impedance, to: waveformController?.impedance)
   }
 	
 	func updateMultimeterState() async throws {
