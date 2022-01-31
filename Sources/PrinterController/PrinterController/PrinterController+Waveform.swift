@@ -8,17 +8,29 @@
 import Foundation
 
 public extension PrinterController {
-  func setVoltage(to voltage: Double) async throws {
+  func setRawVoltage(to voltage: Double) async throws {
     try await with(.waveform) {
-      try await waveformController?.setVoltage(to: voltage)
+      try await waveformController?.setRawVoltage(to: voltage)
     }
   }
   
-  func setVoltageOffset(to offset: Double) async throws {
+  func setRawVoltageOffset(to offset: Double) async throws {
     try await with(.waveform) {
-      try await waveformController?.setVoltageOffset(to: offset)
+      try await waveformController?.setRawVoltageOffset(to: offset)
     }
   }
+	
+	func setAmplifiedVoltage(to voltage: Double) async throws {
+		try await with(.waveform) {
+			try await waveformController?.setAmplifiedVoltage(to: voltage)
+		}
+	}
+	
+	func setAmplifiedVoltageOffset(to offset: Double) async throws {
+		try await with(.waveform) {
+			try await waveformController?.setRawVoltageOffset(to: offset)
+		}
+	}
   
   func setFrequency(to frequency: Double) async throws {
     try await with(.waveform) {

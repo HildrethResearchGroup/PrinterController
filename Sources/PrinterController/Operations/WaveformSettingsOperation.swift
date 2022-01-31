@@ -31,11 +31,11 @@ extension PrinterOperation {
         }
         
         if let amplitude = configuration.amplitude {
-          try await printerController.setVoltage(to: amplitude)
+          try await printerController.setAmplifiedVoltage(to: amplitude)
         }
         
         if let offset = configuration.offset {
-          try await printerController.setVoltageOffset(to: offset)
+          try await printerController.setAmplifiedVoltageOffset(to: offset)
         }
         
         if let phase = configuration.phase {

@@ -8,6 +8,11 @@
 import XPSQ8Kit
 
 public extension PrinterController {
+	func reenableMovement() async throws {
+		// Perform a zero move, to change the state back to ready from motion
+		try await writeStage(for: .x).moveRelative(by: 0.0)
+	}
+	
   func searchForHome() async throws {
 		switch await xpsq8ConnectionState {
 		case .notConnected, .connecting:
