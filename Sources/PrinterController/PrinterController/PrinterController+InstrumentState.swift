@@ -26,8 +26,8 @@ extension PrinterController {
   }
   
   func updateWaveformState() async throws {
-    try await setWaveformState(\.voltage, to: waveformController?.voltage)
-    try await setWaveformState(\.voltageOffset, to: waveformController?.voltageOffset)
+    try await setWaveformState(\.rawVoltage, to: waveformController?.rawVoltage)
+    try await setWaveformState(\.rawVoltageOffset, to: waveformController?.rawVoltageOffset)
     try await setWaveformState(\.frequency, to: waveformController?.frequency)
     try await setWaveformState(\.phase, to: waveformController?.phase)
     try await setWaveformState(\.waveFunction, to: waveformController?.waveFunction)

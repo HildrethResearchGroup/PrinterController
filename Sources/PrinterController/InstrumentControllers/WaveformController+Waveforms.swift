@@ -8,18 +8,30 @@
 import Cocoa
 
 extension WaveformController {
-  var voltage: Double {
+  var rawVoltage: Double {
     get async throws {
       try await instrument.query("VOLT?", as: Double.self)
     }
   }
   
-  var voltageOffset: Double {
+  var rawVoltageOffset: Double {
     get async throws {
       try await instrument.query("VOLT:OFFS?", as: Double.self)
     }
   }
+	
+	var amplifiedVoltage: Double {
+		get async throws {
+			try await rawVoltage * 1000
+		}
+	}
   
+	var amplifiedVoltageOffset: Double {
+		get async throws {
+			try await rawVoltageOffset * 1000
+		}
+	}
+	
   var frequency: Double {
     get async throws {
       try await instrument.query("FREQ?", as: Double.self)
@@ -43,13 +55,21 @@ extension WaveformController {
     }
   }
   
-  func setVoltage(to voltage: Double) async throws {
+  func setRawVoltage(to voltage: Double) async throws {
     try await instrument.write("VOLT \(voltage)")
   }
   
-  func setVoltageOffset(to offset: Double) async throws {
+  func setRawVoltageOffset(to offset: Double) async throws {
     try await instrument.write("VOLT:OFFS \(offset)")
   }
+	
+	func setAmplifiedVoltage(to voltage: Double) async throws {
+		try await setRawVoltage(to: voltage / 1000)
+	}
+	
+	func setAmplifiedVoltageOffset(to offset: Double) async throws {
+		try await setRawVoltage(to: offset / 1000)
+	}
   
   func setFrequency(to frequency: Double) async throws {
     try await instrument.write("FREQ \(frequency)")
