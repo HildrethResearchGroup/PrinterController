@@ -35,7 +35,12 @@ extension PrinterController {
   }
 	
 	func updateMultimeterState() async throws {
-		// TODO: Implement
+		try await setMultimeterState(\.rawVoltage, to: multimeterController?.rawVoltage)
+	}
+	
+	@MainActor
+	func setMultimeterState<T>(_ keypath: WritableKeyPath<MultimeterState, T>, to value: T) {
+		multimeterState[keyPath: keypath] = value
 	}
   
   @MainActor

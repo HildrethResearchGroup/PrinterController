@@ -97,6 +97,7 @@ extension AnyPrinterOperation {
 		case wait
 		case move
 		case printLine
+		case gapHeightCalibrate
   }
 }
 
