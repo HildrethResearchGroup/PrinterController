@@ -35,7 +35,7 @@ extension PrinterController {
   }
 	
 	func updateMultimeterState() async throws {
-		try await setMultimeterState(\.rawVoltage, to: multimeterController?.rawVoltage)
+		try await setMultimeterState(\.rawResistance, to: multimeterController?.rawResistance)
 	}
 	
 	@MainActor

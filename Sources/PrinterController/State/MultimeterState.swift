@@ -10,5 +10,5 @@ import Foundation
 public struct MultimeterState {
 	public var updateInterval: TimeInterval? = 0.2
 	
-	public internal(set) var rawVoltage: Double?
+	public internal(set) var rawResistance: Double?
 }

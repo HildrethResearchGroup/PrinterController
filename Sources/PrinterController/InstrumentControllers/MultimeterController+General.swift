@@ -8,11 +8,11 @@
 import Foundation
 
 extension MultimeterController {
-	var rawVoltage: Double {
+	var rawResistance: Double {
 		get async throws {
-			try await instrument.write("CONF:VOLT:DC AUTO")
-			try await instrument.write("SAMP:COUN 1")
+			try await instrument.write("CONF:RES")
 			return try await instrument.query("READ?", as: Double.self)
 		}
 	}
+	
 }

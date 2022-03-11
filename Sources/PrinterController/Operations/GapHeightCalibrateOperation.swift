@@ -8,6 +8,7 @@
 import SwiftUI
 
 public struct GapHeightCalibrateOperationConfiguration: Codable, Hashable {
+	// TODO: Get rid of targetVoltage
 	public var targetVoltage = 0.0
 	public var displacementAmount = 0.01
 	
@@ -26,24 +27,23 @@ public extension PrinterOperation {
 			name: "Calibrate Gap Height",
 			thumbnailName: "arrow.down.to.line",
 			body: body) { configuration, printerController in
-				guard var currentVoltage = await printerController.multimeterState.rawVoltage else {
+				guard var currentResistance = await printerController.multimeterState.rawResistance else {
 					throw PrinterController.Error.instrumentNotInitialized
 				}
 				
-				try await printerController.turnVoltageOn()
+				try await printerController.turnVoltageOff()
 				
-				while currentVoltage < configuration.targetVoltage {
+				while currentResistance == .infinity {
 					try await printerController.moveRelative(in: .z, by: configuration.displacementAmount)
 					await printerController.waitFor(xpsq8Status: .readyFromMotion)
 					
-					guard let nextVoltage = try await printerController.multimeterController?.rawVoltage else {
+					guard let nextResistance = try await printerController.multimeterController?.rawResistance else {
 						throw PrinterController.Error.instrumentNotInitialized
 					}
 					
-					currentVoltage = nextVoltage
+					currentResistance = nextResistance
 				}
 				
-				try await printerController.turnVoltageOff()
 			}
 	}
 }
