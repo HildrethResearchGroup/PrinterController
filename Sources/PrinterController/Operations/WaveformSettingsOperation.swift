@@ -8,6 +8,7 @@
 import SwiftUI
 
 public struct WaveformSettingsConfiguration: Hashable, Codable {
+	// TODO: Add ON State
   public var frequency: Double?
   public var amplitude: Double?
   public var offset: Double?
