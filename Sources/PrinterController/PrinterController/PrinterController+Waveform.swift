@@ -58,12 +58,14 @@ public extension PrinterController {
   
   func turnVoltageOn() async throws {
     try await with(.waveform) {
+			await setWaveformState(\.voltageIsOn, to: true)
       try await waveformController?.turnVoltageOn()
     }
   }
   
   func turnVoltageOff() async throws {
     try await with(.waveform) {
+			await setWaveformState(\.voltageIsOn, to: false)
       try await waveformController?.turnVoltageOff()
     }
   }

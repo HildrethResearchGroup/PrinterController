@@ -34,3 +34,11 @@ public enum WaveFunction: String, Codable, Hashable, CaseIterable {
     }
   }
 }
+
+#if canImport(SwiftUI)
+extension WaveFunction: Identifiable {
+	public var id: String {
+		rawValue
+	}
+}
+#endif

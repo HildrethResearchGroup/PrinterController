@@ -60,6 +60,12 @@ extension WaveformController {
 			try await instrument.query("OUTPUT1:LOAD?", as: Double.self)
 		}
 	}
+	
+	var isOutputOn: Bool {
+		get async throws {
+			try await instrument.query("OUTPUT?", as: Bool.self)
+		}
+	}
   
   func setRawVoltage(to voltage: Double) async throws {
     try await instrument.write("VOLT \(voltage)")
