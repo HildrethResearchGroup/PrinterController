@@ -24,7 +24,8 @@ extension PrinterOperation {
 			thumbnailName: "clock",
 			body: body
 		) { configuration, printerController in
-			try? await printerController.turnVoltageOff()
+			// TODO: Add option to leave or turn off voltage
+			//try? await printerController.turnVoltageOff()
 			try await printerController.wait(for: configuration.time)
 		}
 	}
