@@ -98,6 +98,7 @@ extension AnyPrinterOperation {
 		case move
 		case printLine
 		case gapHeightCalibrate
+		case printDotArray
   }
 }
 
