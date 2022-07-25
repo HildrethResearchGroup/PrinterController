@@ -43,7 +43,7 @@ extension PrinterOperation {
 				
 				try await printerController.moveRelative(in: configuration.dimension, by: configuration.lineLength)
 				await printerController.waitFor(xpsq8Status: .readyFromMotion)
-				try await printerController.turnVoltageOff()
+				//try await printerController.turnVoltageOff()
 			}
 			
 			if configuration.returnToStart {
@@ -51,6 +51,8 @@ extension PrinterOperation {
 				try await printerController.moveAbsolute(in: configuration.dimension, to: startingPosition)
 				await printerController.waitFor(xpsq8Status: .readyFromMotion)
 			}
+            //collin
+            try await printerController.turnVoltageOff()
 		}
 	}
 }
