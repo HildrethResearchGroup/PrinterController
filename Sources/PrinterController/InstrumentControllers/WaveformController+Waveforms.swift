@@ -46,7 +46,7 @@ extension WaveformController {
     
     var pulseWidth: Double {
         get async throws {
-            try await instrument.query("FUNC:PULS:WIDT?", as Double.self)
+            try await instrument.query("FUNC:PULS:WIDT?", as: Double.self)
         }
     }
   

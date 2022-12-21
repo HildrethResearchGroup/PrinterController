@@ -24,15 +24,16 @@ extension PrinterController {
       try await setXPSQ8Position(in: dimension, position(in: dimension))
     }
   }
-  
-  func updateWaveformState() async throws {
-    try await setWaveformState(\.rawVoltage, to: waveformController?.rawVoltage)
-    try await setWaveformState(\.rawVoltageOffset, to: waveformController?.rawVoltageOffset)
-    try await setWaveformState(\.frequency, to: waveformController?.frequency)
-    try await setWaveformState(\.phase, to: waveformController?.phase)
-    try await setWaveformState(\.waveFunction, to: waveformController?.waveFunction)
-		try await setWaveformState(\.impedance, to: waveformController?.impedance)
-  }
+    
+    func updateWaveformState() async throws {
+        try await setWaveformState(\.rawVoltage, to: waveformController?.rawVoltage)
+        try await setWaveformState(\.rawVoltageOffset, to: waveformController?.rawVoltageOffset)
+        try await setWaveformState(\.frequency, to: waveformController?.frequency)
+        try await setWaveformState(\.phase, to: waveformController?.phase)
+        try await setWaveformState(\.pulseWidth, to: waveformController?.pulseWidth)
+        try await setWaveformState(\.waveFunction, to: waveformController?.waveFunction)
+        try await setWaveformState(\.impedance, to: waveformController?.impedance)
+    }
 	
 	func updateMultimeterState() async throws {
 		try await setMultimeterState(\.rawResistance, to: multimeterController?.rawResistance)

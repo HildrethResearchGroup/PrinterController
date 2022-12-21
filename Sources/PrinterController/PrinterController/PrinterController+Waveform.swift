@@ -43,6 +43,15 @@ public extension PrinterController {
       try await waveformController?.setPhase(to: phase)
     }
   }
+    
+    
+    func setPulseWidth(to pulseWidth: Double) async throws {
+        try await with(.waveform) {
+            try await waveformController?.setPulseWidth(to: pulseWidth)
+        }
+    }
+    
+    
   
   func setWaveFunction(to waveFunction: WaveFunction) async throws {
     try await with(.waveform) {
@@ -56,6 +65,8 @@ public extension PrinterController {
 		}
 	}
   
+
+    
   func turnVoltageOn() async throws {
     try await with(.waveform) {
 			await setWaveformState(\.voltageIsOn, to: true)
