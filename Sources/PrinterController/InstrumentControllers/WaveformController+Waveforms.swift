@@ -43,6 +43,12 @@ extension WaveformController {
       try await instrument.query("PHAS?", as: Double.self)
     }
   }
+    
+    var pulseWidth: Double {
+        get async throws {
+            try await instrument.query("FUNC:PULS:WIDT?", as Double.self)
+        }
+    }
   
   var waveFunction: WaveFunction {
     get async throws {
@@ -90,6 +96,10 @@ extension WaveformController {
   func setPhase(to phase: Double) async throws {
     try await instrument.write("PHAS \(phase)")
   }
+    
+    func setPulseWidth(to pulseWidth: Double) async throws {
+        try await instrument.write("FUNC:PULS:WIDT \(pulseWidth)")
+    }
   
   func setWaveFunction(to waveFunction: WaveFunction) async throws {
     try await instrument.write("FUNC \(waveFunction.rawValue)")
