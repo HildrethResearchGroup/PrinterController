@@ -15,8 +15,8 @@ let package = Package(
     .package(url: "https://github.com/SwiftVISA/SwiftVISASwift.git", .branch("actor")),
 //    .package(url: "https://github.com/HildrethResearchGroup/XPSQ8Kit.git", .branch("actor")),
     .package(name: "XPSQ8Kit", path: "../XPSQ8Kit"),
-    .package(url: "https://github.com/apple/swift-collections", from: "0.0.1"),
-    .package(url: "https://github.com/armadsen/ORSSerialPort.git", branch: "master"),
+    .package(url: "https://github.com/apple/swift-collections", from: "0.0.1")//,
+    //.package(url: "https://github.com/armadsen/ORSSerialPort.git", branch: "master"),
   ],
   targets: [
     .target(
@@ -24,8 +24,8 @@ let package = Package(
       dependencies: [
         "SwiftVISASwift",
         "XPSQ8Kit",
-        .product(name: "Collections", package: "swift-collections"),
-        .product(name: "ORSSerial", package: "ORSSerialPort")
+        .product(name: "Collections", package: "swift-collections")//,
+        //.product(name: "ORSSerial", package: "ORSSerialPort")
       ]),
     .testTarget(
       name: "PrinterControllerTests",
