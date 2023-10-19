@@ -25,7 +25,7 @@ let package = Package(
         "SwiftVISASwift",
         "XPSQ8Kit",
         .product(name: "Collections", package: "swift-collections"),
-        .product(name: "ORSSerial", package: "ORSSerialPort")
+        .product(name: "ORSSerialPort", package: "ORSSerialPort")
       ]),
     .testTarget(
       name: "PrinterControllerTests",
