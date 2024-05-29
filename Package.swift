@@ -5,7 +5,7 @@ import PackageDescription
 
 let package = Package(
   name: "PrinterController",
-  platforms: [.macOS("12.0")],
+  platforms: [.macOS("14.0")],
   products: [
     .library(
       name: "PrinterController",
