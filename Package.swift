@@ -24,7 +24,7 @@ let package = Package(
       dependencies: [
         "SwiftVISASwift",
         "XPSQ8Kit",
-        .product(name: "Collections", package: "swift-collections")//,
+        //.product(name: "Collections", package: "swift-collections")//,
         //.product(name: "ORSSerial", package: "ORSSerialPort")
       ]) /*,
     .testTarget(
