@@ -13,7 +13,7 @@ let package = Package(
   ],
   dependencies: [
     .package(url: "https://github.com/SwiftVISA/SwiftVISASwift.git", .branch("actor")),
-    .package(url: "https://github.com/HildrethResearchGroup/XPSQ8Kit.git", .branch("master")),
+    .package(url: "https://github.com/HildrethResearchGroup/XPSQ8Kit.git", .branch("actor")),
 //    .package(name: "XPSQ8Kit", path: "../XPSQ8Kit"),
     //.package(url: "https://github.com/apple/swift-collections", .branch("release/1.1"))//,
     //.package(url: "https://github.com/armadsen/ORSSerialPort.git", branch: "master"),
